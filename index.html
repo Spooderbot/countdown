@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Countdown to July 18, 2026</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Press Start 2P', cursive;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .container {
+            text-align: center;
+            position: relative;
+            z-index: 10;
+        }
+
+        img.main-image {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            border: 5px solid #fff;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 22px;
+            color: #fff;
+            text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            margin-bottom: 20px;
+        }
+
+        .countdown {
+            font-size: 32px;
+            color: #fff;
+            text-shadow: 0 0 20px rgba(255, 105, 180, 0.8);
+            font-weight: bold;
+            margin: 30px 0;
+            letter-spacing: 2px;
+        }
+
+        .audio-button {
+            background: linear-gradient(135deg, #ff6b9d 0%, #c44569 100%);
+            border: none;
+            color: white;
+            padding: 12px 24px;
+            font-size: 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            font-family: 'Press Start 2P', cursive;
+            transition: all 0.3s;
+            margin-top: 20px;
+        }
+
+        .audio-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .audio-button:active {
+            transform: scale(0.95);
+        }
+
+        /* Heart Burst Animation */
+        @keyframes heartBurst {
+            0% {
+                opacity: 1;
+                transform: translate(0, 0) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translate(var(--tx), var(--ty)) scale(0);
+            }
+        }
+
+        @keyframes heartBurstBottom {
+            0% {
+                opacity: 1;
+                transform: translate(0, 0) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translate(var(--tx), var(--ty)) scale(0);
+            }
+        }
+
+        @keyframes heartWaterfall {
+            0% {
+                opacity: 1;
+                transform: translateY(0) translateX(0) rotate(0deg);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(100vh) translateX(var(--drift)) rotate(360deg);
+            }
+        }
+
+        .heart {
+            position: fixed;
+            font-size: 24px;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .heart-burst {
+            animation: heartBurst 1.5s ease-out forwards;
+        }
+
+        .heart-burst-bottom {
+            animation: heartBurstBottom 2s ease-out forwards;
+        }
+
+        .heart-waterfall {
+            animation: heartWaterfall 3s ease-in-out infinite;
+        }
+
+        /* Bunny Animation */
+        @keyframes bunnyruncycle {
+            0%, 100% { background-position: 0 0; }
+            100% { background-position: -100% 0; }
+        }
+
+        .bunny {
+            position: fixed;
+            width: 100px;
+            height: 100px;
+            background-size: 100px 100px;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        .bunny-top {
+            top: 20px;
+            animation: bunnyruncycle 6s steps(4, end) infinite;
+        }
+
+        .bunny-bottom {
+            bottom: 20px;
+            animation: bunnyruncycle 10s steps(4, end) infinite;
+        }
+
+        @keyframes slideRight {
+            from {
+                left: -100px;
+            }
+            to {
+                left: 100vw;
+            }
+        }
+
+        .slide-right {
+            animation: slideRight 6s linear infinite;
+        }
+
+        .slide-right-slow {
+            animation: slideRight 10s linear infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img src="photo.png" alt="us" class="main-image">
+        <h1>Countdown to July 18, 2026</h1>
+        <div class="countdown" id="countdown">Loading...</div>
+        <button class="audio-button" id="audioButton">🔊 Play Music</button>
+    </div>
+
+    <audio id="audioElement" src="music.mp3" preload="none"></audio>
+
+    <div class="bunny bunny-top slide-right" id="bunnyTop" style="background-image: url('jaxi.gif');"></div>
+    <div class="bunny bunny-bottom slide-right-slow" id="bunnyBottom" style="background-image: url('me.gif');"></div>
+
+    <script>
+        const audio = document.getElementById('audioElement');
+        const audioButton = document.getElementById('audioButton');
+        let isPlaying = false;
+
+        audioButton.addEventListener('click', () => {
+            if (isPlaying) {
+                audio.pause();
+                audioButton.textContent = '🔊 Play Music';
+                isPlaying = false;
+            } else {
+                audio.play().catch(err => console.log('Autoplay blocked:', err));
+                audio.volume = 0.05;
+                audioButton.textContent = '⏸ Pause Music';
+                isPlaying = true;
+            }
+        });
+
+        const countdownElement = document.getElementById('countdown');
+        const target = new Date('2026-07-18T00:00:00');
+
+        function updateCountdown() {
+            const now = new Date();
+            const diff = target - now;
+
+            if (diff <= 0) {
+                countdownElement.textContent = 'Happy Day!';
+                return;
+            }
+
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+            countdownElement.textContent = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+        }
+
+        updateCountdown();
+        setInterval(updateCountdown, 1000);
+
+        // Heart burst from center
+        function createHeartBurst() {
+            for (let i = 0; i < 16; i++) {
+                const heart = document.createElement('div');
+                heart.className = 'heart heart-burst';
+                heart.textContent = '❤️';
+                
+                const angle = (i / 16) * Math.PI * 2;
+                const distance = 150;
+                const tx = Math.cos(angle) * distance + (Math.random() - 0.5) * 50;
+                const ty = Math.sin(angle) * distance + (Math.random() - 0.5) * 50;
+                
+                heart.style.setProperty('--tx', tx + 'px');
+                heart.style.setProperty('--ty', ty + 'px');
+                heart.style.left = window.innerWidth / 2 + 'px';
+                heart.style.top = window.innerHeight / 2 + 'px';
+                heart.style.transform = 'translate(-50%, -50%)';
+                
+                document.body.appendChild(heart);
+                setTimeout(() => heart.remove(), 1500);
+            }
+        }
+
+        // Heart burst from bottom
+        function createBottomHeartBurst() {
+            for (let i = 0; i < 12; i++) {
+                const heart = document.createElement('div');
+                heart.className = 'heart heart-burst-bottom';
+                heart.textContent = '❤️';
+                
+                const angle = (i / 12) * Math.PI;
+                const distance = 120;
+                const tx = Math.cos(angle) * distance + (Math.random() - 0.5) * 40;
+                const ty = -Math.sin(angle) * distance - 50;
+                
+                heart.style.setProperty('--tx', tx + 'px');
+                heart.style.setProperty('--ty', ty + 'px');
+                heart.style.left = window.innerWidth / 2 + 'px';
+                heart.style.bottom = '0px';
+                heart.style.transform = 'translate(-50%, 0)';
+                
+                document.body.appendChild(heart);
+                setTimeout(() => heart.remove(), 2000);
+            }
+        }
+
+        // Waterfall hearts
+        function createHeartWaterfall() {
+            for (let i = 0; i < 8; i++) {
+                const heart = document.createElement('div');
+                heart.className = 'heart heart-waterfall';
+                heart.textContent = '❤️';
+                
+                const drift = (Math.random() - 0.5) * 200;
+                heart.style.setProperty('--drift', drift + 'px');
+                heart.style.left = Math.random() * window.innerWidth + 'px';
+                heart.style.top = '-50px';
+                
+                document.body.appendChild(heart);
+                setTimeout(() => heart.remove(), 3000);
+            }
+        }
+
+        setInterval(createHeartBurst, 2000);
+        setInterval(createBottomHeartBurst, 3000);
+        setInterval(createHeartWaterfall, 300);
+    </script>
+</body>
+</html>
